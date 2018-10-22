@@ -1,0 +1,92 @@
+﻿{
+  "Name": "Retail Customer",
+  "Connections": [
+    {
+      "Name": "SqlConnection",
+      "Type": "Sql",
+      "Parameter": {
+        "ConnectionString": "data source=\"[server address]\";initial catalog=\"[db name]\";user id=\"[user id]\";password=\"[passowrd]\"",
+        "BatchSize": 200
+      }
+    },
+    {
+      "Name": "SfdcConnection",
+      "Type": "Sfdc",
+      "Parameter": {
+        "UserName": "[username]",
+        "Password": "[password]",
+        "Token": "[token]",
+        "ApiPassword": "[api password = password + token]",
+        "Endpoint": "https://test.salesforce.com/services/Soap/u/43.0"
+      }
+    }
+  ],
+  "Tasks": [
+    {
+      "Name": "Retail Contact Upsert to SFDC Contact",
+      "Type": "SqlToSfdc",
+      "SourceConnection": "SqlConnection",
+      "SourceCommand": "SELECT LastName\r\n\t, FirstName\r\n\t, '01236000000xxWCAAY' AS RecordTypeId\r\n\t, Address + CHAR(10) + CHAR(13) + Address2 AS MaillingStreet\r\n\t, Phone\r\n\t, MobileNo\r\n\t, Email\r\n\t, 'POS' AS LeadSource\r\n\t, '0053C000000zKGaQAM' AS OwnerId\r\n\t, BirthDay\r\n\t, Gender\r\n\t, BirthMonth\r\n\t, No\r\n\t, Action\r\nFROM RTContacts_TEST\r\nWHERE Action = 'Modify';",
+      "TargetConnection": "SfdcConnection",
+      "TargetCommand": {
+        "Operation": 1,
+        "Object": "Contact",
+        "UpsertKeyField": "No__c"
+      },
+      "Mapping": [
+        {
+          "From": "LastName",
+          "To": "LastName"
+        },
+        {
+          "From": "FirstName",
+          "To": "FirstName"
+        },
+        {
+          "From": "RecordTypeId",
+          "To": "RecordTypeId"
+        },
+        {
+          "From": "MaillingStreet",
+          "To": "MailingStreet"
+        },
+        {
+          "From": "Phone",
+          "To": "Phone"
+        },
+        {
+          "From": "MobileNo",
+          "To": "MobilePhone"
+        },
+        {
+          "From": "Email",
+          "To": "Email"
+        },
+        {
+          "From": "LeadSource",
+          "To": "LeadSource"
+        },
+        {
+          "From": "OwnerId",
+          "To": "OwnerId"
+        },
+        {
+          "From": "BirthDay",
+          "To": "Birth_Day__c"
+        },
+        {
+          "From": "Gender",
+          "To": "Gender__c"
+        },
+        {
+          "From": "BirthMonth",
+          "To": "Birth_Month_Only__c"
+        },
+        {
+          "From": "No",
+          "To": "No__c"
+        }
+      ]
+    }
+  ]
+}
